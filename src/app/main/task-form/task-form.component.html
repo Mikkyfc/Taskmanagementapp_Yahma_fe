@@ -1,0 +1,116 @@
+<div class="container mx-auto p-4">
+  <div class="flex justify-between items-center mb-4">
+    <div class="flex flex-col gap-1">
+      <h2 class="text-xl font-semibold" style="margin: 0;">{{ isEdit ? 'Edit Task' : 'Add Task' }}</h2>
+      <p>{{ isEdit ? 'Update task details' : 'Create a new task' }}</p>
+    </div>
+    <a [routerLink]="['/tasks']" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+      ← Back
+    </a>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <div class="mb-4">
+        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+        <input 
+          type="text" 
+          id="title" 
+          formControlName="title" 
+          class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+          placeholder="Enter task title"
+        >
+        <div 
+          *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched" 
+          class="text-red-500 text-sm mt-1"
+        >
+          Title is required and must not exceed 100 characters.
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+        <textarea 
+          id="description" 
+          formControlName="description" 
+          class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+          placeholder="Enter task description"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label for="dueDate" class="block text-sm font-medium text-gray-700">Due Date</label>
+        <input 
+          type="date" 
+          id="dueDate" 
+          formControlName="dueDate" 
+          class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [ngClass]="{'border-red-500': taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched}"
+          [min]="isEdit ? null : minDate"
+        >
+        <div 
+          *ngIf="taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched" 
+          class="text-red-500 text-sm mt-1"
+        >
+          <span *ngIf="taskForm.get('dueDate')?.errors?.['required']">Due date is required.</span>
+          <span *ngIf="!isEdit && taskForm.get('dueDate')?.errors?.['futureDate']">{{ taskForm.get('dueDate')?.errors?.['futureDate'] }}</span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+        <select 
+          id="status" 
+          formControlName="status" 
+          class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option *ngFor="let status of taskStatus | keyvalue" [value]="status.value">{{ status.value }}</option>
+        </select>
+        <div 
+          *ngIf="taskForm.get('status')?.invalid && taskForm.get('status')?.touched" 
+          class="text-red-500 text-sm mt-1"
+        >
+          Status is required.
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
+        <select 
+          id="priority" 
+          formControlName="priority" 
+          class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option *ngFor="let priority of taskPriority | keyvalue" [value]="priority.value">{{ priority.value }}</option>
+        </select>
+        <div 
+          *ngIf="taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched" 
+          class="text-red-500 text-sm mt-1"
+        >
+          Priority is required.
+        </div>
+      </div>
+
+      <div *ngIf="error" class="bg-red-100 text-red-700 p-4 rounded mb-4">{{ error }}</div>
+      <div *ngIf="loading" class="bg-blue-100 text-blue-700 p-4 rounded mb-4">Loading...</div>
+
+      <div class="flex justify-end gap-2">
+        <a 
+          [routerLink]="['/tasks']" 
+          class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
+        >
+          Cancel
+        </a>
+        <button 
+          id="submit-task-btn"
+          type="submit" 
+          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+          [disabled]="taskForm.invalid || loading"
+        >
+          {{ isEdit ? 'Update' : 'Create' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
